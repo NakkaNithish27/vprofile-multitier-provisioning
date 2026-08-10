@@ -1,54 +1,24 @@
-VProfile Multi-Tier Application — Automated Provisioning
+# VProfile Multi-Tier Provisioning
 
 A hands-on DevOps project demonstrating the deployment, configuration, validation, and automated provisioning of a traditional multi-tier VProfile application across multiple Linux virtual machines using Vagrant and Bash.
 
-«Application ownership: VProfile was used as the application workload for this project. The engineering work documented here focuses on the infrastructure environment, service configuration, application deployment, automation, and validation—not development of the VProfile application itself.»
-
 ---
 
-Project Overview
+## Overview
 
-The project implements a multi-tier application environment consisting of five virtual machines:
+This project deploys the **VProfile application** across a five-VM multi-tier environment.
 
-                         User
-                          │
-                       Browser
-                          │
-                          ▼
-                  ┌──────────────┐
-                  │    Nginx     │
-                  │    web01     │
-                  │    Port 80   │
-                  └──────┬───────┘
-                         │
-                    Reverse Proxy
-                         │
-                         ▼
-                  ┌──────────────┐
-                  │    Tomcat    │
-                  │    app01     │
-                  │   Port 8080  │
-                  └──────┬───────┘
-                         │
-              ┌──────────┼──────────┐
-              │          │          │
-              ▼          ▼          ▼
-        ┌──────────┐ ┌──────────┐ ┌────────────┐
-        │  MySQL   │ │ RabbitMQ │ │  Memcache  │
-        │  db01    │ │  rmq01   │ │   mc01     │
-        │  :3306   │ │  :5672   │ │  :11211    │
-        └──────────┘ └──────────┘ └────────────┘
+The environment consists of:
 
-The environment was first understood and configured through manual provisioning and then converted into an automated provisioning workflow using Bash scripts and Vagrant provisioners.
+- **Nginx** — frontend reverse proxy
+- **Tomcat** — application server
+- **MySQL/MariaDB** — relational database
+- **RabbitMQ** — message broker
+- **Memcached** — caching layer
 
----
+The project follows a practical progression:
 
-Project Objective
-
-The objective was to understand how a traditional multi-tier application is assembled from individual infrastructure and application services, and then convert the manual setup process into a repeatable automated provisioning workflow.
-
-The project follows this progression:
-
+```text
 Manual Provisioning
         ↓
 Service Configuration
@@ -57,429 +27,323 @@ Application Deployment
         ↓
 End-to-End Validation
         ↓
-Manual Environment Destroyed
+Bash Automation
         ↓
-Provisioning Commands Encoded as Bash
+Vagrant Provisioning
         ↓
-Vagrant Provisioners Added
-        ↓
-Automated Provisioning
-        ↓
-End-to-End Validation
+Single-Command Environment Setup
+```
 
-The final workflow allows the environment to be created and provisioned through:
-
-vagrant up
+The same application architecture is first understood and configured manually and then converted into a repeatable automated provisioning workflow.
 
 ---
 
-My Engineering Contribution
+## Application Ownership Boundary
 
-The project involved hands-on work across the infrastructure and deployment layers.
+The VProfile application is used as the **application workload** for this project; it was provided as part of the course/project material.
 
-Infrastructure & Systems
+My engineering work focuses on the environment around the application:
 
-- Created and managed a multi-VM Vagrant environment.
-- Worked with Linux-based virtual machines.
-- Installed and configured the required services.
-- Managed services using "systemctl".
-- Configured service connectivity between VMs.
-- Worked with host-based service discovery.
+- Provisioning the virtual machines
+- Configuring the required Linux services
+- Deploying the application
+- Configuring communication between application and backend services
+- Configuring Nginx as the frontend reverse proxy
+- Validating the complete application stack
+- Executing the automated provisioning workflow
+- Managing the Vagrant environment lifecycle
 
-Application Deployment
-
-- Configured the Tomcat application server.
-- Built and deployed the application artifact.
-- Configured Nginx as the frontend reverse proxy.
-- Connected the application tier with MySQL, RabbitMQ, and Memcache.
-
-Automation
-
-- Converted manual provisioning procedures into Bash-based provisioning scripts.
-- Used Vagrant shell provisioners to execute the scripts automatically.
-- Used shell variables for parameterization.
-- Used non-interactive MySQL commands.
-- Used Bash heredocs to generate configuration files without an interactive editor.
-- Managed the provisioning lifecycle through Vagrant.
-
-Validation
-
-Validated the completed application stack through the application itself:
-
-- Nginx/Tomcat application access
-- MySQL-backed authentication
-- RabbitMQ connectivity
-- Memcache functionality
-- End-to-end application flow
+This project does **not** claim ownership of the VProfile application's source code, business logic, or application development.
 
 ---
 
-Architecture
+## Architecture
 
-The environment contains five primary service tiers:
+![VProfile Architecture](architecture.png)
 
-VM| Service| Role
-"web01"| Nginx| Frontend reverse proxy
-"app01"| Tomcat| Application server
-"db01"| MySQL/MariaDB| Persistent database
-"rmq01"| RabbitMQ| Message broker
-"mc01"| Memcache| In-memory cache
+The environment uses five virtual machines:
 
-Request Flow
+| VM | Service | Role |
+|---|---|---|
+| `web01` | Nginx | Frontend / Reverse Proxy |
+| `app01` | Tomcat | Application Server |
+| `db01` | MySQL/MariaDB | Database |
+| `rmq01` | RabbitMQ | Message Broker |
+| `mc01` | Memcached | Caching Layer |
 
-Browser
-   │
-   │ HTTP :80
-   ▼
-Nginx (web01)
-   │
-   │ proxy_pass
-   ▼
-Tomcat (app01)
-   │
-   ├──────────────► MySQL (db01)
-   │
-   ├──────────────► RabbitMQ (rmq01)
-   │
-   └──────────────► Memcache (mc01)
+### Request Flow
 
-"Architecture" (architecture.png)
+```text
+User
+  │
+  │ HTTP :80
+  ▼
+Nginx / web01
+  │
+  │ proxy_pass
+  ▼
+Tomcat / app01
+  │
+  ├──────────────► MySQL / db01
+  ├──────────────► RabbitMQ / rmq01
+  └──────────────► Memcached / mc01
+```
+
+Nginx receives the user's HTTP request and forwards it to Tomcat. The application server communicates with the backend database, message broker, and caching service.
 
 For the detailed architecture and service relationships:
 
-"→ Architecture Documentation" (docs/architecture.md)
+**[Architecture →](docs/architecture.md)**
 
 ---
 
-Manual → Automated Provisioning
+## My Engineering Contribution
 
-A major engineering objective of the project was converting a manually executed deployment process into an automated provisioning workflow.
+The practical work covered the complete deployment lifecycle:
 
-Manual Approach
+### Infrastructure
 
+- Created and managed a multi-VM Vagrant environment
+- Configured VM networking and hostname-based service communication
+- Managed VM lifecycle using Vagrant
+
+### Linux Service Configuration
+
+- Installed and configured the required services
+- Managed services using `systemctl`
+- Configured service connectivity and required ports
+- Troubleshot service and configuration issues
+
+### Application Deployment
+
+- Configured Tomcat as the application server
+- Built and deployed the application artifact
+- Configured the application to communicate with backend services
+
+### Reverse Proxy
+
+- Installed and configured Nginx
+- Configured an upstream pointing to Tomcat
+- Configured HTTP traffic on port 80
+- Activated the VProfile Nginx configuration
+
+### Automation
+
+The manual provisioning process was converted into an automated workflow using:
+
+- Bash shell scripts
+- Vagrant shell provisioners
+- Non-interactive package installation
+- Shell variables
+- Non-interactive MySQL commands
+- Heredoc-based configuration file generation
+
+The result is a provisioning workflow where:
+
+```bash
+vagrant up
+```
+
+creates and provisions the complete environment.
+
+---
+
+## Automated Provisioning
+
+The automated environment separates the provisioning logic by service:
+
+```text
+Vagrantfile
+    │
+    ├── db01      → mysql.sh
+    ├── mc01      → memcache.sh
+    ├── rmq01     → rabbitmq.sh
+    ├── app01     → tomcat_ubuntu.sh
+    └── web01     → nginx.sh
+```
+
+The provisioning lifecycle is:
+
+```text
 vagrant up
     ↓
-SSH into VM
+Create VM
     ↓
-Run commands manually
+Boot VM
     ↓
-Configure files manually
+Wait for SSH readiness
     ↓
-Start services
+Execute provisioning script
     ↓
-Repeat for next VM
-
-Automated Approach
-
-vagrant up
+Configure service
     ↓
-Vagrant reads Vagrantfile
-    ↓
-Creates VM
-    ↓
-Waits for VM to become accessible
-    ↓
-Runs associated provisioning script
-    ↓
-Moves to next VM
+Continue to next VM
     ↓
 Complete stack
+```
 
-Each VM has an associated provisioning script:
+The provisioning order follows the dependency structure of the application environment.
 
-VM| Provisioning Script
-"db01"| "mysql.sh"
-"mc01"| "memcache.sh"
-"rmq01"| "rabbitmq.sh"
-"app01"| "tomcat_ubuntu.sh"
-"web01"| "nginx.sh"
+For the implementation details:
+
+**[Implementation →](docs/implementation.md)**
 
 ---
 
-Key Automation Techniques
+## Validation
 
-Bash Shebang
+The completed stack was validated through the application itself.
 
-Each provisioning script uses:
+### Frontend / Application
 
-#!/bin/bash
+Accessing the web tier validates the path:
 
-This identifies Bash as the script interpreter.
-
-Parameterization
-
-Shell variables are used where values need to be referenced multiple times.
-
-Non-Interactive SQL
-
-Instead of entering the MySQL shell interactively, SQL can be executed from Bash:
-
-mysql -u username -p password -e "SQL QUERY"
-
-Heredoc Configuration
-
-Configuration files can be created directly from a script:
-
-cat > /path/to/file <<EOT
-configuration content
-goes here
-EOT
-
-This removes the need for an interactive editor such as "vim" during automated provisioning.
-
-Vagrant Provisioners
-
-The Vagrantfile associates each VM with its provisioning script so that Vagrant can execute the required configuration automatically.
-
-Detailed implementation information is available here:
-
-"→ Implementation Documentation" (docs/implementation.md)
-
----
-
-Provisioning Order
-
-The automated environment is provisioned sequentially:
-
-1. db01
-   ↓
-2. mc01
-   ↓
-3. rmq01
-   ↓
-4. app01
-   ↓
-5. web01
-
-The ordering follows the dependency structure of the application environment.
-
-The application tier depends on the backend services, while Nginx provides the frontend entry point to the Tomcat application tier.
-
----
-
-Validation
-
-The completed environment was validated through the application.
-
-Application Access
-
-The browser accesses the Nginx frontend:
-
+```text
 Browser
-   ↓
-http://web01
    ↓
 Nginx
    ↓
 Tomcat
    ↓
 VProfile application
+```
 
-Database Validation
+### Database
 
-The application login uses:
+Successful application login validates the application's connectivity to MySQL/MariaDB.
 
-Username: admin_vp
-Password: admin_vp
+### RabbitMQ
 
-A successful login validates the application's connectivity to the database and the availability of the required database data.
+The application's RabbitMQ validation function confirms connectivity to the message broker.
 
-RabbitMQ Validation
+### Memcached
 
-The application provides a RabbitMQ validation operation.
+The cache validation demonstrates that application data can be retrieved from the database and subsequently served from the cache.
 
-A successful result confirms that the application can communicate with RabbitMQ.
+The validation model therefore checks the stack through real application interactions rather than simply checking whether individual services are running.
 
-Memcache Validation
-
-The application performs a cache test by retrieving user information.
-
-The first request retrieves data from the database and inserts it into the cache.
-
-A subsequent request for the same data demonstrates retrieval from the cache.
-
-First request
-    ↓
-MySQL
-    ↓
-Application
-    ↓
-Memcache populated
-
-Second request
-    ↓
-Memcache
-    ↓
-Application
-
-Detailed validation methodology is documented here:
-
-"→ Validation Documentation" (docs/validation.md)
+**[Validation →](docs/validation.md)**
 
 ---
 
-Vagrant Environment Lifecycle
+## Environment Lifecycle
 
 The automated environment supports the following lifecycle:
 
+```text
 vagrant up
-    │
-    ▼
-Create + Provision
-    │
-    ▼
-Running
+    ↓
+Running + Provisioned
     │
     ├── vagrant halt
     │       ↓
     │   Powered Off
-    │       │
-    │       └── vagrant up
-    │               ↓
-    │            Running
+    │       ↓
+    │   vagrant up
+    │       ↓
+    │   Running
     │
     └── vagrant destroy -f
             ↓
-       Environment Removed
-            │
-            └── vagrant up
-                    ↓
-             Fresh Rebuild
+        Clean Environment
+            ↓
+        vagrant up
+            ↓
+        Fresh Provisioning
+```
 
-Common Commands
+Important Vagrant behavior:
 
-# Create and provision the environment
-vagrant up
-
-# Check VM state
-vagrant status
-
-# Stop the VMs while preserving their state
-vagrant halt
-
-# Start existing VMs
-vagrant up
-
-# Re-run provisioning
-vagrant provision
-
-# Force provisioning during startup
-vagrant up --provision
-
-# Destroy the environment
-vagrant destroy -f
-
-A normal "vagrant up" on already-created VMs starts the existing machines without automatically re-running the provisioning scripts.
+- Initial `vagrant up` creates and provisions the VMs.
+- `vagrant halt` powers off the environment while preserving its state.
+- `vagrant up` on existing VMs powers them back on without automatically reprovisioning them.
+- `vagrant provision` or `vagrant up --provision` can explicitly rerun provisioning.
+- `vagrant destroy -f` removes the environment so it can be rebuilt from scratch.
 
 ---
 
-Engineering Lessons
+## Key Engineering Concepts Demonstrated
 
-The most important engineering lessons from this project are:
+This project provided practical experience with:
 
-1. Understand before automating
-
-The manual deployment process established how each service works and how the components depend on one another.
-
-2. Automation should encode an understood process
-
-The automated scripts capture the previously manual operations rather than introducing an entirely different deployment process.
-
-3. Infrastructure configuration can be treated as code
-
-The Vagrantfile and provisioning scripts describe how the environment should be assembled and configured.
-
-4. Automation must be non-interactive
-
-Commands that require human interaction must be adapted before they can reliably participate in automated provisioning.
-
-5. Validation should test the complete data path
-
-A service being "running" does not necessarily prove that the application can use it.
-
-Application-level validation provides stronger evidence that:
-
-Service
-   +
-Configuration
-   +
-Credentials
-   +
-Network Connectivity
-   +
-Application Integration
-
-are working together.
-
----
-
-Project Boundaries
-
-This project demonstrates local multi-VM application deployment and automated provisioning.
-
-It does not establish:
-
-- production-grade cloud infrastructure
-- AWS deployment
-- Terraform-based infrastructure provisioning
-- Ansible configuration management
-- Kubernetes orchestration
-- CI/CD implementation
-- GitOps
-- production-grade high availability
-- production observability
-- development of the VProfile application itself
-
-The VProfile application was used as the workload for the infrastructure and deployment exercise.
-
----
-
-Technologies
-
-Infrastructure
-
-- Vagrant
-- VirtualBox
-- Linux Virtual Machines
-
-Web & Application
-
-- Nginx
-- Apache Tomcat
-- Maven
-
-Backend Services
-
+- Multi-tier application architecture
+- Linux system administration
+- Nginx reverse proxying
+- Tomcat application deployment
 - MySQL/MariaDB
 - RabbitMQ
-- Memcache
+- Memcached
+- Vagrant
+- Bash scripting
+- Shell provisioners
+- Non-interactive automation
+- Heredoc configuration generation
+- Service management with systemd
+- Hostname-based service discovery
+- End-to-end application validation
+- Repeatable environment provisioning
 
-Automation
+The broader engineering pattern is:
 
-- Bash
-- Vagrant Shell Provisioners
-- systemd
-
-Validation
-
-- Browser-based application validation
-- Service-level validation
-- End-to-end integration validation
+```text
+Understand Manually
+        ↓
+Automate the Procedure
+        ↓
+Provision Repeatedly
+        ↓
+Validate the Result
+        ↓
+Destroy and Rebuild When Required
+```
 
 ---
 
-Documentation
+## Project Boundaries
 
-Document| Purpose
-"Architecture" (docs/architecture.md)| System architecture, service relationships, traffic flow, and boundaries
-"Implementation" (docs/implementation.md)| Provisioning, configuration, deployment, automation, and lifecycle
-"Validation" (docs/validation.md)| Validation strategy, checks, results, and evidence
-"Limitations & Future Work" (docs/limitations-and-future-work.md)| Current boundaries and potential future evolution
+This project demonstrates **local multi-VM application deployment and automated provisioning**.
+
+It does not demonstrate:
+
+- Production cloud infrastructure
+- Terraform-based infrastructure provisioning
+- Kubernetes orchestration
+- CI/CD pipelines
+- GitOps
+- Production-grade high availability
+- Production observability architecture
+- Production database high availability
+- Development of the VProfile application itself
+
+These capabilities belong to later stages of the broader DevOps learning progression.
+
+For the complete boundaries and possible evolution of this project:
+
+**[Limitations & Future Work →](docs/limitations-and-future-work.md)**
 
 ---
 
-Repository Structure
+## Technologies
 
+| Category | Technologies |
+|---|---|
+| Virtualization | VirtualBox |
+| VM Management | Vagrant |
+| Operating Systems | Linux |
+| Web Tier | Nginx |
+| Application Tier | Apache Tomcat |
+| Database | MySQL / MariaDB |
+| Messaging | RabbitMQ |
+| Caching | Memcached |
+| Automation | Bash / Shell Provisioning |
+| Build | Maven |
+| Source Control | Git / GitHub |
+
+---
+
+## Repository Structure
+
+```text
 vprofile-multitier-provisioning/
 │
 ├── README.md
@@ -504,63 +368,72 @@ vprofile-multitier-provisioning/
 │   └── screenshots/
 │
 └── .gitignore
+```
 
 ---
 
-Ownership & Attribution
+## Documentation
 
-This repository represents the infrastructure, deployment, configuration, automation, and validation work performed as part of the project.
-
-The VProfile application itself was used as the project workload and should not be interpreted as an application developed by the repository owner.
-
-Course-provided or third-party artifacts should only be redistributed when their ownership and redistribution rights permit it. Where applicable, such artifacts should be clearly attributed rather than represented as original work.
-
----
-
-Project Outcome
-
-The project demonstrates the progression from:
-
-Manual Infrastructure Operations
-              ↓
-Understanding Service Dependencies
-              ↓
-Application Deployment
-              ↓
-End-to-End Validation
-              ↓
-Bash Automation
-              ↓
-Vagrant Provisioning
-              ↓
-Repeatable Environment Creation
-
-The key engineering capability demonstrated is the ability to understand a traditional multi-tier application environment, configure its infrastructure and services, validate the complete application path, and encode the provisioning process into an automated workflow.
+| Document | Purpose |
+|---|---|
+| [Architecture](docs/architecture.md) | System architecture, service relationships, traffic flow, and design boundaries |
+| [Implementation](docs/implementation.md) | Provisioning, configuration, deployment, and automation implementation |
+| [Validation](docs/validation.md) | End-to-end validation strategy and results |
+| [Limitations & Future Work](docs/limitations-and-future-work.md) | Current boundaries and potential future evolution |
 
 ---
 
-Next Evolution
+## Evidence
 
-The concepts established here provide a foundation for progressively more advanced DevOps implementations:
+Evidence is intentionally kept limited to high-signal artifacts demonstrating:
 
-Vagrant + Bash
-      ↓
-Containerization
-      ↓
-Cloud Deployment
-      ↓
-Infrastructure as Code
-      ↓
-Configuration Management
-      ↓
-Container Orchestration
-      ↓
-CI/CD
-      ↓
-GitOps
+- Environment architecture
+- Successful provisioning
+- Successful application deployment
+- End-to-end validation
 
-Future implementations should be treated as separate engineering iterations rather than retroactively claiming capabilities that were not demonstrated by this project.
+Only evidence from the completed project environment should be used as proof of execution.
+
+**[View Evidence →](evidence/screenshots/)**
 
 ---
 
-"← Back to Repository Root" (./)
+## Key Takeaway
+
+The main engineering lesson from this project is the transition from **manual operational procedures to repeatable provisioning**.
+
+Instead of repeatedly executing:
+
+```text
+SSH
+  ↓
+Install
+  ↓
+Configure
+  ↓
+Start
+  ↓
+Validate
+```
+
+the process becomes:
+
+```text
+Vagrantfile
+     ↓
+Provisioning Scripts
+     ↓
+vagrant up
+     ↓
+Complete Environment
+```
+
+The infrastructure definition and provisioning logic become executable, repeatable project artifacts rather than a sequence of commands that must be manually remembered.
+
+---
+
+## Project Status
+
+**Completed — local multi-tier deployment and automated provisioning workflow.**
+
+The project serves as a foundation for progressing toward more advanced DevOps practices such as containerization, cloud deployment, Infrastructure as Code, configuration management, orchestration, and CI/CD.
