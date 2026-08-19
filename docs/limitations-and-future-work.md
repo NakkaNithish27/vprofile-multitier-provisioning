@@ -1,7 +1,7 @@
 # Limitations & Future Work
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/33d165d3-b539-4936-a5f0-4ac9b0067221" />
-
 [← Back to README](../README.md) | [Architecture](architecture.md) | [Implementation](implementation.md) | [Validation](validation.md)
+
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/33d165d3-b539-4936-a5f0-4ac9b0067221" />
 
 ## 1. Purpose
 
