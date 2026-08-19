@@ -1,8 +1,7 @@
 # VProfile Validation
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/b6ca60b4-aec4-4675-9134-033f36c9ef90" />
-
-
 [← Back to README](../README.md) | [Architecture](architecture.md) | [Implementation](implementation.md)
+
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/b6ca60b4-aec4-4675-9134-033f36c9ef90" />
 
 ## 1. Validation Overview
 
