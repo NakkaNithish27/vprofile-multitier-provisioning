@@ -1,4 +1,5 @@
 # VProfile Implementation
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/147d3b17-d84a-4fce-8d64-1f491a6d311f" />
 
 [← Back to README](../README.md) | [Architecture](architecture.md)
 
