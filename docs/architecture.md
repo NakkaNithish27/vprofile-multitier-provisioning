@@ -1,5 +1,6 @@
 # VProfile Architecture
 [← Back to README](../README.md)
+
 <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/e4895072-8071-450b-9092-a3279112f065" />
 
 ## 1. Architecture Overview
