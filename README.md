@@ -1,4 +1,6 @@
 # VProfile Multi-Tier Provisioning
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/477c4803-b0fd-4d5e-93cd-7f366583b3f0" />
+
 
 A hands-on DevOps project demonstrating the deployment, configuration, validation, and automated provisioning of a traditional multi-tier VProfile application across multiple Linux virtual machines using Vagrant and Bash.
 
